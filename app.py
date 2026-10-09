@@ -140,7 +140,7 @@ else:
         else:
             with st.spinner("ဗီဒီယိုကို ဒေါင်းလုဒ်လုပ်နေပါပြီ..."):
                 ydl_opts = {
-                    'cookiefile': 'chromewebstore.google.com_cookies.txt',
+                    'cookiefile': '[https://raw.githubusercontent.com/.../chromewebstore.google.com_cookies.txt](https://raw.githubusercontent.com/.../chromewebstore.google.com_cookies.txt)'
                     'format': 'bestaudio/best',
                     'outtmpl': 'audio.%(ext)s',
                     'postprocessors': [{
