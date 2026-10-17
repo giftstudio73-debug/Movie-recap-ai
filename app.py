@@ -74,7 +74,7 @@ if not st.session_state.logged_in:
                 conn = sqlite3.connect('database.db')
                 c = conn.cursor()
                 try:
-                    c.execute("INSERT INTO users VALUES (?, ?, 0, 0)", (reg_user, reg_pass))
+                    c.execute("INSERT INTO users VALUES (?, ?, 5, 0)", (reg_user, reg_pass))
                     conn.commit()
                     st.sidebar.success("အကောင့်ဖွင့်လှစ်ခြင်း အောင်မြင်ပါသည်။ Login ဝင်ရောက်ပါ။")
                 except sqlite3.IntegrityError:
