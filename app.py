@@ -6,8 +6,8 @@ import google.generativeai as genai
 # Page Config
 st.set_page_config(page_title="AI Movie Recap Script Generator", page_icon="🎬", layout="wide")
 
-# Gemini API Key Config (AQ.Ab8RN6LzZhHAR6k0nTn7dcWzkz1VyL5nLIA-vkIlBR_jmA9W_Q)
-GEMINI_API_KEY = "GEMINI_API_KEY=AQ.Ab8RN6LzZhHAR6k0nTn7dcWzkz1VyL5nLIA-vkIlBR_jmA9W_Q"
+# Gemini API Key Config ("AQ.Ab8RN6LzZhHAR6k0nTn7dcWzkz1VyL5nLIA-vkIlBR_jmA9W_Q")
+GEMINI_API_KEY = "YOUR_GEMINI_API_KEY_HERE"
 genai.configure(api_key=GEMINI_API_KEY)
 
 # Admin & Payment Config
@@ -207,15 +207,44 @@ else:
                     5. စာဖတ်သူ/နားထောင်သူ ဆွဲဆောင်မှုရှိစေမည့် စကားပြောဟန်ဖြင့် ရေးပေးပါရှင်။
                     """
                     response = model.generate_content(prompt)
-                    
-                    # Deduct credit
-                    if not st.session_state.is_admin:
-                        update_user_credits(st.session_state.username, current_credits - 1)
-                    
-                    st.success("✨ ဇာတ်ညွှန်း ဖန်တီးမှု အောင်မြင်ပါသည်။")
-                    st.subheader("📝 ထွက်ရှိလာသော Movie Recap Script:")
-                    st.markdown(response.text)
-                    st.rerun()
-                    
-                except Exception as e:
-                    st.error(f"အမှားယွင်း ဖြစ်ပေါ်သွားပါသည်: {str(e)}")
+                    try:
+        model = genai.GenerativeModel('gemini-1.5-flash')
+        prompt = f"""
+မင်းက ကျွမ်းကျင်တဲ့ Movie Recap Script Writer တစ်ယောက်ပါ။
+အောက်ပါ ဇာတ်လမ်းအကျဉ်းကို အခြေခံပြီး {target_duration} အကြာမြင့်ဖြင့်မည့် စိတ်ဝင်စားဖွယ် Movie Recap စာသားတစ်ခုကို ရေးပေးပါ။
+
+ဇာတ်လမ်းအကြောင်းအရာ:
+{story_input}
+
+ရေးသားရမည့် ပုံစံ:
+1. စိတ်ဝင်စားဖွယ် Intro (စတင်ပျိုးထောင်ခြင်း)
+2. ဇာတ်လမ်း အစိတ်ပိုင်းအလိုက် အသေးစိတ် ရှင်းလင်းချက်များ (Detailed Scene-by-Scene Description)
+3. Climax နှင့် အမှတ်တထင် အတွေ့အကြုံများ (Twists & Climax)
+4. ဇာတ်သိမ်းနှင့် သုံးသပ်ချက် Outro
+5. စာဖတ်သူ/နားထောင်သူ ဆွဲဆောင်မှုရှိစေမည့် စကားပြောဟန်ဖြင့် ရေးပေးပါရန်။
+"""
+        response = model.generate_content(prompt)
+
+        # ကြာချိန်အလိုက် Credit ကုန်ကျစရိတ် သတ်မှတ်ခြင်း
+        if target_duration == "၅ မိနစ်စာ Recap":
+            credit_cost = 1
+        elif target_duration == "၁၀ မိနစ်စာ Recap":
+            credit_cost = 5
+        elif target_duration == "၁၅ မိနစ်စာ Recap (အသေးစိတ်)":
+            credit_cost = 10
+        else:
+            credit_cost = 1
+
+        # Deduct credit
+        if not st.session_state.is_admin:
+            update_user_credits(st.session_state.username, current_credits - credit_cost)
+
+        st.success("✨ ဇာတ်ညွှန်း ဖန်တီးမှု အောင်မြင်ပါသည်။")
+        st.subheader("📝 ထွက်ရှိလာသော Movie Recap Script:")
+        st.markdown(response.text)
+        st.rerun()
+
+    except Exception as e:
+        st.error(f"အမှားယွင်း ဖြစ်ပေါ်သွားပါသည်: {str(e)}")
+        
+       
