@@ -6,8 +6,8 @@ import google.generativeai as genai
 # Page Config
 st.set_page_config(page_title="AI Movie Recap Script Generator", page_icon="🎬", layout="wide")
 
-# Gemini API Key Config
-GEMINI_API_KEY = os.getenv("GEMINI_API_KEY", "YOUR_GEMINI_API_KEY_HERE")
+# Gemini API Key Config (သင့်ရဲ့ တကယ့် API Key ကို " " အတွင်းတွင် ထည့်ပါ)
+GEMINI_API_KEY = "YOUR_GEMINI_API_KEY_HERE"
 genai.configure(api_key=GEMINI_API_KEY)
 
 # Admin & Payment Config
@@ -189,7 +189,7 @@ else:
         elif not story_input.strip():
             st.warning("ကျေးဇူးပြု၍ ဇာတ်လမ်းအကြောင်းအရာ ရိုက်ထည့်ပါ။")
         else:
-            with st.spinner("AI မှ ၁၅ မိနစ်စာ Movie Recap ဇာတ်ညွှန်း ရေးသားနေပါသည်... ခဏစောင့်ပါ..."):
+            with st.spinner("AI မှ ဇာတ်ညွှန်း ရေးသားနေပါသည်... ခဏစောင့်ပါ..."):
                 try:
                     model = genai.GenerativeModel('gemini-1.5-flash')
                     prompt = f"""
