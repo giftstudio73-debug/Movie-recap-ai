@@ -1,12 +1,16 @@
 import streamlit as st
 import sqlite3
 import os
-import yt_dlp
-import whisper
-from googletrans import Translator
+import google.generativeai as genai
 
-st.set_page_config(page_title="YouTube Movie Recap AI", page_icon="🎬", layout="wide")
+# Page Config
+st.set_page_config(page_title="Text-to-Movie Recap AI", page_icon="🎬", layout="wide")
 
+# Gemini API Key ချိန်ညှိရန်
+GEMINI_API_KEY = os.getenv("GEMINI_API_KEY", "YOUR_GEMINI_API_KEY_HERE")
+genai.configure(api_key=GEMINI_API_KEY)
+
+# Admin & Database Configuration
 ADMIN_USERNAME = "admin"
 ADMIN_PASSWORD = "Ah199421"
 KPAY_PHONE = "09961668096"
@@ -20,12 +24,13 @@ def init_db():
     conn.commit()
     c.execute("SELECT * FROM users WHERE username = ?", (ADMIN_USERNAME,))
     if not c.fetchone():
-        c.execute("INSERT INTO users VALUES (?, ?, 9999, 1)", (ADMIN_USERNAME, ADMIN_PASSWORD))
+        c.execute("INSERT INTO users VALUES (?, ?, ?, 1)", (ADMIN_USERNAME, ADMIN_PASSWORD, 9999))
         conn.commit()
     conn.close()
 
 init_db()
 
+# Session State Initialization
 if 'logged_in' not in st.session_state:
     st.session_state.logged_in = False
 if 'username' not in st.session_state:
@@ -33,147 +38,51 @@ if 'username' not in st.session_state:
 if 'is_admin' not in st.session_state:
     st.session_state.is_admin = 0
 
-if not st.session_state.logged_in:
-    st.title("🎬 YouTube Movie Recap AI - Login")
-    tab1, tab2 = st.tabs(["Login", "Register"])
-    
-    with tab1:
-        username = st.text_input("Username", key="login_user")
-        password = st.text_input("Password", type="password", key="login_pass")
-        if st.button("Login"):
-            conn = sqlite3.connect('database.db')
-            c = conn.cursor()
-            c.execute("SELECT * FROM users WHERE username = ? AND password = ?", (username, password))
-            user = c.fetchone()
-            conn.close()
-            if user:
-                st.session_state.logged_in = True
-                st.session_state.username = user[0]
-                st.session_state.is_admin = user[3]
-                st.success("Successfully logged in!")
-                st.rerun()
-            else:
-                st.error("Invalid username or password.")
+# UI Design
+st.title("🎬 AI Movie Recap Script Generator (Myanmar)")
+st.write("သင့်ကိုယ်ပိုင် ဇာတ်လမ်းအကျဉ်း သို့မဟုတ် ဇာတ်ညွှန်းကို ရိုက်ထည့်ပြီး ၁၅ မိနစ်စာ Movie Recap စာသားအပြည့်အစုံကို ဖန်တီးလိုက်ပါ။")
+
+# Input Section
+story_input = st.text_area(
+    "ဇာတ်လမ်း သို့မဟုတ် ဇာတ်ညွှန်းအကျဉ်း ရိုက်ထည့်ပါ:",
+    height=250,
+    placeholder="ဥပမာ- ကောင်လေးတစ်ယောက်ဟာ ရှေးဟောင်းသေတ္တာတစ်လုံးကို တွေ့ရှိခဲ့ရာကနေ အတိတ်ကာလကို ခရီးသွားနိုင်တဲ့ စွမ်းအားရရှိခဲ့ပါတယ်။..."
+)
+
+target_duration = st.selectbox(
+    "ဖန်တီးလိုသော ဗီဒီယို ကြာချိန်ကို ရွေးချယ်ပါ:",
+    ["၁၅ မိနစ်စာ Recap (အသေးစိတ်)", "၁၀ မိနစ်စာ Recap", "၅ မိနစ်စာ Recap"]
+)
+
+if st.button("Generate Recap Script", type="primary"):
+    if not story_input.strip():
+        st.warning("ကျေးဇူးပြု၍ ဇာတ်လမ်းအကြောင်းအရာ ရိုက်ထည့်ပါ။")
+    else:
+        with st.spinner("AI မှ ၁၅ မိနစ်စာ Movie Recap ဇာတ်ညွှန်း ရေးသားနေပါသည်... ခဏစောင့်ပါ..."):
+            try:
+                # Gemini Model ခေါ်ယူခြင်း
+                model = genai.GenerativeModel('gemini-1.5-flash')
                 
-    with tab2:
-        new_user = st.text_input("Choose Username", key="reg_user")
-        new_pass = st.text_input("Choose Password", type="password", key="reg_pass")
-        if st.button("Register"):
-            if new_user and new_pass:
-                conn = sqlite3.connect('database.db')
-                c = conn.cursor()
-                try:
-                    c.execute("INSERT INTO users VALUES (?, ?, ?, 0)", (new_user, new_pass, 5))
-                    conn.commit()
-                    st.success("Account created successfully! Please login.")
-                except sqlite3.IntegrityError:
-                    st.warning("Username already exists.")
-                conn.close()
-            else:
-                st.warning("Please fill in all fields.")
-else:
-    conn = sqlite3.connect('database.db')
-    c = conn.cursor()
-    c.execute("SELECT credits FROM users WHERE username = ?", (st.session_state.username,))
-    current_credits = c.fetchone()[0]
-    conn.close()
+                prompt = f"""
+                မင်းက ကျွမ်းကျင်တဲ့ Movie Recap Script Writer တစ်ယောက်ပါ။
+                အောက်ပါ ဇာတ်လမ်းအကျဉ်းကို အခြေခံပြီး {target_duration} စာကြာမြင့်မယ့် စိတ်ဝင်စားဖွယ် Movie Recap စာသား (Voiceover Script) ကို မြန်မာဘာသာဖြင့် အသေးစိတ် ရေးသားပေးပါ။
 
-    st.sidebar.title(f"Welcome, {st.session_state.username}")
-    st.sidebar.metric(label="Available Credits", value=f"{current_credits} Credits")
-    st.sidebar.markdown("---")
-    
-    st.sidebar.subheader("Top Up Credits (KPay)")
-    st.sidebar.text(f"KPay: {KPAY_PHONE}\nName: {KPAY_NAME}\n1000 MMK = 5 Credits")
-    topup_amount = st.sidebar.selectbox("Select Package", ["1000 MMK (5 Credits)", "5000 MMK (30 Credits)", "10000 MMK (70 Credits)"])
-    sender_phone = st.sidebar.text_input("Your KPay Phone / Name")
-    
-    if st.sidebar.button("Submit Top Up Request"):
-        if sender_phone:
-            conn = sqlite3.connect('database.db')
-            c = conn.cursor()
-            c.execute("INSERT INTO topup_requests (username, amount, phone, status) VALUES (?, ?, ?, ?)", (st.session_state.username, topup_amount, sender_phone, "Pending"))
-            conn.commit()
-            conn.close()
-            st.sidebar.success("Top up request sent successfully!")
-        else:
-            st.sidebar.warning("Please enter your details.")
+                ဇာတ်လမ်းအကြောင်းအရာ:
+                {story_input}
 
-    if st.session_state.is_admin == 1:
-        st.sidebar.markdown("---")
-        st.sidebar.subheader("Admin Panel")
-        if st.sidebar.checkbox("View Top-up Requests"):
-            conn = sqlite3.connect('database.db')
-            c = conn.cursor()
-            c.execute("SELECT id, username, amount, phone, status FROM topup_requests WHERE status = 'Pending'")
-            requests = c.fetchall()
-            conn.close()
-            if requests:
-                for req in requests:
-                    st.sidebar.write(f"ID: {req[0]} | User: {req[1]} | {req[2]} | By: {req[3]}")
-                    if st.sidebar.button(f"Approve ID {req[0]}", key=f"app_{req[0]}"):
-                        add_cr = 5 if "1000" in req[2] else (30 if "5000" in req[2] else 70)
-                        conn = sqlite3.connect('database.db')
-                        c = conn.cursor()
-                        c.execute("UPDATE users SET credits = credits + ? WHERE username = ?", (add_cr, req[1]))
-                        c.execute("UPDATE topup_requests SET status = 'Approved' WHERE id = ?", (req[0],))
-                        conn.commit()
-                        conn.close()
-                        st.sidebar.success(f"Approved ID {req[0]}!")
-                        st.rerun()
-            else:
-                st.sidebar.info("No pending requests.")
-
-    if st.sidebar.button("Logout"):
-        st.session_state.logged_in = False
-        st.rerun()
-
-    st.title("🎬 YouTube Movie Recap AI (Myanmar Translated)")
-    st.write("YouTube ဗီဒီယိုလင့်ခ်ကို ထည့်သွင်းပြီး မြန်မာဘာသာသို့ အလိုအလျောက် ပြန်ဆိုထုတ်လုပ်လိုက်ပါ။")
-
-    youtube_url = st.text_input("Enter YouTube Video Link:")
-
-    if st.button("Generate Recap"):
-        if not youtube_url:
-            st.warning("ကျေးဇူးပြု၍ YouTube လင့်ခ် ထည့်ပါ။")
-        elif current_credits < 1:
-            st.error("Credits မလုံလောက်ပါ။ KPay ဖြင့် ငွေဖြည့်ပါ။")
-        else:
-            with st.spinner("ဗီဒီယိုကို ဒေါင်းလုဒ်လုပ်နေပါပြီ..."):
-                ydl_opts = {
-                    'cookiefile': '[https://raw.githubusercontent.com/.../chromewebstore.google.com_cookies.txt](https://raw.githubusercontent.com/.../chromewebstore.google.com_cookies.txt)'
-                    'format': 'bestaudio/best',
-                    'outtmpl': 'audio.%(ext)s',
-                    'postprocessors': [{
-                        'key': 'FFmpegExtractAudio',
-                        'preferredcodec': 'mp3',
-                        'preferredquality': '192',
-                    }],
-                }
-                try:
-                    if os.path.exists("audio.mp3"):
-                        os.remove("audio.mp3")
-                    with yt_dlp.YoutubeDL(ydl_opts) as ydl:
-                        ydl.download([youtube_url])
-                    
-                    st.info("အသံဖိုင်ကို AI ဖြင့် စာသားပြောင်းနေပါပြီ...")
-                    model = whisper.load_model("tiny")
-                    result = model.transcribe("audio.mp3")
-                    english_text = result["text"]
-
-                    st.info("မြန်မာဘာသာသို့ ဘာသာပြန်ဆိုနေပါပြီ...")
-                    translator = Translator()
-                    translation = translator.translate(english_text, dest='my')
-                    myanmar_text = translation.text
-
-                    conn = sqlite3.connect('database.db')
-                    c = conn.cursor()
-                    c.execute("UPDATE users SET credits = credits - 1 WHERE username = ?", (st.session_state.username,))
-                    conn.commit()
-                    conn.close()
-
-                    st.success("အောင်မြင်စွာ ထုတ်လုပ်ပြီးပါပြီ!")
-                    st.subheader("📝 Movie Recap (Myanmar)")
-                    st.write(myanmar_text)
-
-                except Exception as e:
-                    st.error(f"အမှားအယွင်း ဖြစ်ပေါ်သွားပါသည်: {e}")
+                ရေးသားရမည့် ပုံစံ:
+                1. စိတ်ဝင်စားဖွယ် Intro (စတင်ပျိုးထောင်ခြင်း)
+                2. ဇာတ်လမ်း အစိတ်ပိုင်းအလိုက် အသေးစိတ် ရှင်းလင်းချက်များ (Detailed Scene-by-Scene Description)
+                3. Climax နှင့် အမှတ်မထင် အကေ့အကွက်များ (Twists & Climax)
+                4. ဇာတ်သိမ်းနှင့် သုံးသပ်ချက် Outro
+                5. စာဖတ်သူ/နားထောင်သူ ဆွဲဆောင်မှုရှိစေမည့် စကားပြောဟန်ဖြင့် ရေးပေးပါရှင်။
+                """
+                
+                response = model.generate_content(prompt)
+                
+                st.success("✨ ဇာတ်ညွှန်း ဖန်တီးမှု အောင်မြင်ပါသည်။")
+                st.subheader("📝 ထွက်ရှိလာသော Movie Recap Script:")
+                st.markdown(response.text)
+                
+            except Exception as e:
+                st.error(f"အမှားယွင်း ဖြစ်ပေါ်သွားပါသည်: {str(e)}")
