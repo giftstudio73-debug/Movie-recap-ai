@@ -8,7 +8,6 @@ st.set_page_config(page_title="AI Movie Recap Script Generator", page_icon="🎬
 
 # Gemini API Key Config (သင့်ရဲ့ တကယ့် API Key ကို " " အတွင်းတွင် ထည့်ပါ)
 GEMINI_API_KEY = " -H "X-TF-Request-Origin: api" -H "X-TF-API-Source: onboarding" -H "X-TF-API-Example: curl-search" -H "X-TF-Connect-Source: setup_page" -H "X-TF-Connect-Client: curl" -H "X-TF-Connect-Attempt-Id: 140b4789-7075-42a5-bfb5-e6432e5e221a"
-genai.configure(api_key=GEMINI_API_KEY)
 
 # Admin & Payment Config
 ADMIN_USERNAME = "admin"
