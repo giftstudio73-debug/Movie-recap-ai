@@ -7,7 +7,7 @@ import google.generativeai as genai
 st.set_page_config(page_title="AI Movie Recap Script Generator", page_icon="🎬", layout="wide")
 
 # Gemini API Key Config (သင့်ရဲ့ တကယ့် API Key ကို " " အတွင်းတွင် ထည့်ပါ)
-GEMINI_API_KEY = "AQ.Ab8RN6LJu5U-RjKh7H0O59KiS2LFcIDTV1gTXCnP48RTT4GgWQ"
+GEMINI_API_KEY = "gen-lang-client-0592489677"
 genai.configure(api_key=GEMINI_API_KEY)
 
 # Admin & Payment Config
