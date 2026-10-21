@@ -7,7 +7,24 @@ import google.generativeai as genai
 st.set_page_config(page_title="AI Movie Recap Script Generator", page_icon="🎬", layout="wide")
 
 # Gemini API Key Config (သင့်ရဲ့ တကယ့် API Key ကို " " အတွင်းတွင် ထည့်ပါ)
-GEMINI_API_KEY = "sk-tinyfish-2r-ZGuZrezQPFQQEXv30rZlCAoYD4K1J"
+GEMINI_API_KEY = "import base64
+from google import genai
+
+client = genai.Client()
+
+interaction = client.interactions.create(
+    model="lyria-3-clip-preview",
+    input="A short instrumental acoustic guitar piece.",
+)
+
+generated_audio = interaction.output_audio
+if generated_audio:
+    with open("music.mp3", "wb") as f:
+        f.write(base64.b64decode(generated_audio.data))
+
+lyrics = interaction.output_text
+if lyrics:
+    print(f"Lyrics:\n{lyrics}")"
 
 # Admin & Payment Config
 ADMIN_USERNAME = "admin"
