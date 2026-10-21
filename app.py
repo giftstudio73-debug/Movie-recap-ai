@@ -4,7 +4,7 @@ import os
 import google.generativeai as genai
 
 # Page Config
-st.set_page_config(page_title="AI Movie Recap Script Generator", page_icon="🎬", layout="wide")
+st.set_page_config(page_title="Ahkhi Movie recap", page_icon="🎬", layout="wide")
 
 # Gemini API Key Config (သင့်ရဲ့ တကယ့် API Key ကို " " အတွင်းတွင် ထည့်ပါ)
 GEMINI_API_KEY = "A short instrumental acoustic guitar piece."
