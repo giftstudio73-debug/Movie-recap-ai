@@ -75,7 +75,7 @@ if not st.session_state.logged_in:
                 try:
                     c.execute("INSERT INTO users VALUES (?, ?, 20, 0)", (reg_user, reg_pass))
                     conn.commit()
-                    st.sidebar.success("အကောင့်ဖွင့်လှစ်ခြင်း အောင်မြင်ပါသည်။ Free Credits 5 ကြိမ် ရရှိပါသည်။ Login ဝင်ရောက်ပါ။")
+                    st.sidebar.success("အကောင့်ဖွင့်လှစ်ခြင်း အောင်မြင်ပါသည်။ Free Credits 20 ကြိမ် ရရှိပါသည်။ Login ဝင်ရောက်ပါ။")
                 except sqlite3.IntegrityError:
                     st.sidebar.error("ဒီ Username ဖြင့် အကောင့်ရှိပြီးသားဖြစ်ပါသည်။")
                 conn.close()
@@ -179,7 +179,7 @@ else:
 
     target_duration = st.selectbox(
         "ဖန်တီးလိုသော ဗီဒီယို ကြာချိန်ကို ရွေးချယ်ပါ:",
-        ["၁၅ မိနစ်စာ Recap (အသေးစိတ်)", "၁၀ မိနစ်စာ Recap", "၅ မိနစ်စာ Recap"]
+        ["၅ မိနစ်စာ Recap (အသေးစိတ်)", "၃ မိနစ်စာ Recap", "၁ မိနစ်စာ Recap"]
     )
 
     if st.button("Generate Recap Script", type="primary"):
