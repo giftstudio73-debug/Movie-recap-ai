@@ -190,7 +190,7 @@ else:
         else:
             with st.spinner("AI မှ ဇာတ်ညွှန်း ရေးသားနေပါသည်... ခဏစောင့်ပါ..."):
                 try:
-                    model = genai.GenerativeModel('gemini-3.8-flash')
+                    model = genai.GenerativeModel('gemini-1.5-flash')
                     prompt = f"""
                     မင်းက ကျွမ်းကျင်တဲ့ Movie Recap Script Writer တစ်ယောက်ပါ။
                     အောက်ပါ ဇာတ်လမ်းအကျဉ်းကို အခြေခံပြီး {target_duration} စာကြာမြင့်မယ့် စိတ်ဝင်စားဖွယ် Movie Recap စာသား (Voiceover Script) ကို မြန်မာဘာသာဖြင့် အသေးစိတ် ရေးသားပေးပါ။
@@ -205,7 +205,7 @@ else:
                     4. ဇာတ်သိမ်းနှင့် သုံးသပ်ချက် Outro
                     5. စာဖတ်သူ/နားထောင်သူ ဆွဲဆောင်မှုရှိစေမည့် စကားပြောဟန်ဖြင့် ရေးပေးပါရှင်။
                     """
-                    response = model.generate_content(prompt, request_options={'timeout': 600})
+                  response = model.generate_content(prompt)
                     
                     # Deduct credit
                     if not st.session_state.is_admin:
