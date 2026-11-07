@@ -206,9 +206,6 @@ else:
                     5. စာဖတ်သူ/နားထောင်သူ ဆွဲဆောင်မှုရှိစေမည့် စကားပြောဟန်ဖြင့် ရေးပေးပါရှင်။
                     """
                     response = model.generate_content(prompt, request_options={'timeout': 600})
-)
-
-                    
                     # Deduct credit
                     if not st.session_state.is_admin:
                         update_user_credits(st.session_state.username, current_credits - 1)
