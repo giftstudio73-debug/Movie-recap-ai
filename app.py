@@ -205,7 +205,7 @@ else:
                     4. ဇာတ်သိမ်းနှင့် သုံးသပ်ချက် Outro
                     5. စာဖတ်သူ/နားထောင်သူ ဆွဲဆောင်မှုရှိစေမည့် စကားပြောဟန်ဖြင့် ရေးပေးပါရှင်။
                     """
-                  response = model.generate_content(prompt)
+                    response = model.generate_content(prompt)
                     
                     # Deduct credit
                     if not st.session_state.is_admin:
