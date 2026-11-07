@@ -7,7 +7,7 @@ import google.generativeai as genai
 st.set_page_config(page_title="Ahkhi Movie recap", page_icon="🎬", layout="wide")
 
 # Gemini API Key Config (သင့်ရဲ့ တကယ့် API Key ကို " " အတွင်းတွင် ထည့်ပါ)
-GEMINI_API_KEY = "A short instrumental acoustic guitar piece."
+GEMINI_API_KEY = "AQ.Ab8RN6LuXgKnQKSJtkZAxgK0TQs8iLkABXhYktUr65GfE0plFA"
 
 # Admin & Payment Config
 ADMIN_USERNAME = "admin"
